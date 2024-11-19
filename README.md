@@ -1,1 +1,1 @@
-# Instructiuons on how to run adn test the network here
+# Instructions on how to run and test the network
