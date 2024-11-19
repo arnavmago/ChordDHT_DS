@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package chord;
 
-// Messages
 message Void {}
 
 message NodeInfo {
@@ -31,8 +30,16 @@ message NotifyRequest {
   NodeInfo node = 1;
 }
 
+message KeyList {
+  repeated int32 values = 1;
+}
+
 message TransferKeysRequest {
-  repeated int32 keys = 1;
+  map<int32, KeyList> keys = 1;
+}
+
+message TransferKeysResponse {
+  map<int32, KeyList> keys = 1;
 }
 
 message PingResponse {
@@ -43,30 +50,31 @@ message KeyRequest {
   int32 key = 1;
 }
 
-message KeyResponse {
-  bool found = 1;
+message KeyValueRequest {
+  int32 key = 1;
+  int32 value = 2;
 }
 
+message KeyValueResponse {
+  int32 key = 1;
+  repeated int32 values = 2;
+  bool found = 3;
+}
 
 message GetKeysRequest {
   int32 node_id = 1;
 }
 
-message TransferKeysResponse {
-  repeated int32 keys = 1;
-}
-
-// Service
 service ChordNode {
   rpc FindSuccessor(FindSuccessorRequest) returns (FindSuccessorResponse);
   rpc GetPredecessor(Void) returns (GetPredecessorResponse);
   rpc GetSuccessor(Void) returns (GetSuccessorResponse);
   rpc Notify(NotifyRequest) returns (Void);
   rpc TransferKeys(TransferKeysRequest) returns (Void);
+  rpc GetKeys(GetKeysRequest) returns (TransferKeysResponse);
   rpc Ping(Void) returns (PingResponse);
-  rpc StoreKey(KeyRequest) returns (Void);
-  rpc CheckKey(KeyRequest) returns (KeyResponse);
+  rpc StoreKeyValue(KeyValueRequest) returns (Void);
+  rpc GetKeyValues(KeyRequest) returns (KeyValueResponse);
   rpc UpdateSuccessor(NodeInfo) returns (Void);
   rpc UpdatePredecessor(NodeInfo) returns (Void);
-  rpc GetKeys(GetKeysRequest) returns (TransferKeysResponse);
 }

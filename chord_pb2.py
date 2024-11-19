@@ -24,13 +24,17 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\x12\x05\x63hord\"\x06\n\x04Void\"5\n\x08NodeInfo\x12\x0f\n\x07node_id\x18\x01 \x01(\x05\x12\n\n\x02ip\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\"\"\n\x14\x46indSuccessorRequest\x12\n\n\x02id\x18\x01 \x01(\x05\"6\n\x15\x46indSuccessorResponse\x12\x1d\n\x04node\x18\x01 \x01(\x0b\x32\x0f.chord.NodeInfo\"7\n\x16GetPredecessorResponse\x12\x1d\n\x04node\x18\x01 \x01(\x0b\x32\x0f.chord.NodeInfo\"5\n\x14GetSuccessorResponse\x12\x1d\n\x04node\x18\x01 \x01(\x0b\x32\x0f.chord.NodeInfo\".\n\rNotifyRequest\x12\x1d\n\x04node\x18\x01 \x01(\x0b\x32\x0f.chord.NodeInfo\"#\n\x13TransferKeysRequest\x12\x0c\n\x04keys\x18\x01 \x03(\x05\"\x1f\n\x0cPingResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"\x19\n\nKeyRequest\x12\x0b\n\x03key\x18\x01 \x01(\x05\"\x1c\n\x0bKeyResponse\x12\r\n\x05\x66ound\x18\x01 \x01(\x08\"!\n\x0eGetKeysRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\x05\"$\n\x14TransferKeysResponse\x12\x0c\n\x04keys\x18\x01 \x03(\x05\x32\xe1\x04\n\tChordNode\x12J\n\rFindSuccessor\x12\x1b.chord.FindSuccessorRequest\x1a\x1c.chord.FindSuccessorResponse\x12<\n\x0eGetPredecessor\x12\x0b.chord.Void\x1a\x1d.chord.GetPredecessorResponse\x12\x38\n\x0cGetSuccessor\x12\x0b.chord.Void\x1a\x1b.chord.GetSuccessorResponse\x12+\n\x06Notify\x12\x14.chord.NotifyRequest\x1a\x0b.chord.Void\x12\x37\n\x0cTransferKeys\x12\x1a.chord.TransferKeysRequest\x1a\x0b.chord.Void\x12(\n\x04Ping\x12\x0b.chord.Void\x1a\x13.chord.PingResponse\x12*\n\x08StoreKey\x12\x11.chord.KeyRequest\x1a\x0b.chord.Void\x12\x31\n\x08\x43heckKey\x12\x11.chord.KeyRequest\x1a\x12.chord.KeyResponse\x12/\n\x0fUpdateSuccessor\x12\x0f.chord.NodeInfo\x1a\x0b.chord.Void\x12\x31\n\x11UpdatePredecessor\x12\x0f.chord.NodeInfo\x1a\x0b.chord.Void\x12=\n\x07GetKeys\x12\x15.chord.GetKeysRequest\x1a\x1b.chord.TransferKeysResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\x12\x05\x63hord\"\x06\n\x04Void\"5\n\x08NodeInfo\x12\x0f\n\x07node_id\x18\x01 \x01(\x05\x12\n\n\x02ip\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\"\"\n\x14\x46indSuccessorRequest\x12\n\n\x02id\x18\x01 \x01(\x05\"6\n\x15\x46indSuccessorResponse\x12\x1d\n\x04node\x18\x01 \x01(\x0b\x32\x0f.chord.NodeInfo\"7\n\x16GetPredecessorResponse\x12\x1d\n\x04node\x18\x01 \x01(\x0b\x32\x0f.chord.NodeInfo\"5\n\x14GetSuccessorResponse\x12\x1d\n\x04node\x18\x01 \x01(\x0b\x32\x0f.chord.NodeInfo\".\n\rNotifyRequest\x12\x1d\n\x04node\x18\x01 \x01(\x0b\x32\x0f.chord.NodeInfo\"\x19\n\x07KeyList\x12\x0e\n\x06values\x18\x01 \x03(\x05\"\x86\x01\n\x13TransferKeysRequest\x12\x32\n\x04keys\x18\x01 \x03(\x0b\x32$.chord.TransferKeysRequest.KeysEntry\x1a;\n\tKeysEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\x1d\n\x05value\x18\x02 \x01(\x0b\x32\x0e.chord.KeyList:\x02\x38\x01\"\x88\x01\n\x14TransferKeysResponse\x12\x33\n\x04keys\x18\x01 \x03(\x0b\x32%.chord.TransferKeysResponse.KeysEntry\x1a;\n\tKeysEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\x1d\n\x05value\x18\x02 \x01(\x0b\x32\x0e.chord.KeyList:\x02\x38\x01\"\x1f\n\x0cPingResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"\x19\n\nKeyRequest\x12\x0b\n\x03key\x18\x01 \x01(\x05\"-\n\x0fKeyValueRequest\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\x05\">\n\x10KeyValueResponse\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\x0e\n\x06values\x18\x02 \x03(\x05\x12\r\n\x05\x66ound\x18\x03 \x01(\x08\"!\n\x0eGetKeysRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\x05\x32\xf4\x04\n\tChordNode\x12J\n\rFindSuccessor\x12\x1b.chord.FindSuccessorRequest\x1a\x1c.chord.FindSuccessorResponse\x12<\n\x0eGetPredecessor\x12\x0b.chord.Void\x1a\x1d.chord.GetPredecessorResponse\x12\x38\n\x0cGetSuccessor\x12\x0b.chord.Void\x1a\x1b.chord.GetSuccessorResponse\x12+\n\x06Notify\x12\x14.chord.NotifyRequest\x1a\x0b.chord.Void\x12\x37\n\x0cTransferKeys\x12\x1a.chord.TransferKeysRequest\x1a\x0b.chord.Void\x12=\n\x07GetKeys\x12\x15.chord.GetKeysRequest\x1a\x1b.chord.TransferKeysResponse\x12(\n\x04Ping\x12\x0b.chord.Void\x1a\x13.chord.PingResponse\x12\x34\n\rStoreKeyValue\x12\x16.chord.KeyValueRequest\x1a\x0b.chord.Void\x12:\n\x0cGetKeyValues\x12\x11.chord.KeyRequest\x1a\x17.chord.KeyValueResponse\x12/\n\x0fUpdateSuccessor\x12\x0f.chord.NodeInfo\x1a\x0b.chord.Void\x12\x31\n\x11UpdatePredecessor\x12\x0f.chord.NodeInfo\x1a\x0b.chord.Voidb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'chord_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
+  _globals['_TRANSFERKEYSREQUEST_KEYSENTRY']._loaded_options = None
+  _globals['_TRANSFERKEYSREQUEST_KEYSENTRY']._serialized_options = b'8\001'
+  _globals['_TRANSFERKEYSRESPONSE_KEYSENTRY']._loaded_options = None
+  _globals['_TRANSFERKEYSRESPONSE_KEYSENTRY']._serialized_options = b'8\001'
   _globals['_VOID']._serialized_start=22
   _globals['_VOID']._serialized_end=28
   _globals['_NODEINFO']._serialized_start=30
@@ -45,18 +49,26 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_GETSUCCESSORRESPONSE']._serialized_end=287
   _globals['_NOTIFYREQUEST']._serialized_start=289
   _globals['_NOTIFYREQUEST']._serialized_end=335
-  _globals['_TRANSFERKEYSREQUEST']._serialized_start=337
-  _globals['_TRANSFERKEYSREQUEST']._serialized_end=372
-  _globals['_PINGRESPONSE']._serialized_start=374
-  _globals['_PINGRESPONSE']._serialized_end=405
-  _globals['_KEYREQUEST']._serialized_start=407
-  _globals['_KEYREQUEST']._serialized_end=432
-  _globals['_KEYRESPONSE']._serialized_start=434
-  _globals['_KEYRESPONSE']._serialized_end=462
-  _globals['_GETKEYSREQUEST']._serialized_start=464
-  _globals['_GETKEYSREQUEST']._serialized_end=497
-  _globals['_TRANSFERKEYSRESPONSE']._serialized_start=499
-  _globals['_TRANSFERKEYSRESPONSE']._serialized_end=535
-  _globals['_CHORDNODE']._serialized_start=538
-  _globals['_CHORDNODE']._serialized_end=1147
+  _globals['_KEYLIST']._serialized_start=337
+  _globals['_KEYLIST']._serialized_end=362
+  _globals['_TRANSFERKEYSREQUEST']._serialized_start=365
+  _globals['_TRANSFERKEYSREQUEST']._serialized_end=499
+  _globals['_TRANSFERKEYSREQUEST_KEYSENTRY']._serialized_start=440
+  _globals['_TRANSFERKEYSREQUEST_KEYSENTRY']._serialized_end=499
+  _globals['_TRANSFERKEYSRESPONSE']._serialized_start=502
+  _globals['_TRANSFERKEYSRESPONSE']._serialized_end=638
+  _globals['_TRANSFERKEYSRESPONSE_KEYSENTRY']._serialized_start=440
+  _globals['_TRANSFERKEYSRESPONSE_KEYSENTRY']._serialized_end=499
+  _globals['_PINGRESPONSE']._serialized_start=640
+  _globals['_PINGRESPONSE']._serialized_end=671
+  _globals['_KEYREQUEST']._serialized_start=673
+  _globals['_KEYREQUEST']._serialized_end=698
+  _globals['_KEYVALUEREQUEST']._serialized_start=700
+  _globals['_KEYVALUEREQUEST']._serialized_end=745
+  _globals['_KEYVALUERESPONSE']._serialized_start=747
+  _globals['_KEYVALUERESPONSE']._serialized_end=809
+  _globals['_GETKEYSREQUEST']._serialized_start=811
+  _globals['_GETKEYSREQUEST']._serialized_end=844
+  _globals['_CHORDNODE']._serialized_start=847
+  _globals['_CHORDNODE']._serialized_end=1475
 # @@protoc_insertion_point(module_scope)
