@@ -1,4 +1,3 @@
-# node.py
 import grpc
 from concurrent import futures
 import threading
@@ -14,7 +13,8 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
         self.port = port
         self.m = m
         self.max_id = 2 ** m
-        self.keys = {}  # Dictionary mapping keys to lists of values
+        self.keys = {}
+        self.replica_keys = {}
         self.predecessor = None
         self.successor = {'node_id': self.node_id, 'ip': self.ip, 'port': self.port}
         self.finger_table = [None] * m
@@ -27,7 +27,6 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
         self.server.start()
         print(f"Node {self.node_id} started at {self.ip}:{self.port}")
 
-    # gRPC method implementations
     def GetKeys(self, request, context):
         new_node_id = request.node_id
         keys_to_transfer = {}
@@ -35,7 +34,7 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
             keys_to_remove = []
             for key in list(self.keys.keys()):
                 if self._in_half_open_interval(key, self.node_id, new_node_id):
-                    keys_to_transfer[key] = chord_pb2.KeyList(values=self.keys[key])
+                    keys_to_transfer[str(key)] = chord_pb2.KeyList(values=self.keys[key])
                     keys_to_remove.append(key)
             for key in keys_to_remove:
                 del self.keys[key]
@@ -52,6 +51,7 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
             else:
                 self.keys[key] = [value]
             print(f"Node {self.node_id}: Stored value {value} under key {key}")
+        self.replicate_key_value_to_successor(key, value)
         return chord_pb2.Void()
 
     def GetKeyValues(self, request, context):
@@ -66,12 +66,18 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
     def TransferKeys(self, request, context):
         with self.lock:
             for key, key_list in request.keys.items():
-                if key in self.keys:
-                    self.keys[key].extend(key_list.values)
+                key_int = int(key)
+                if key_int in self.keys:
+                    existing_values = set(self.keys[key_int])
+                    for value in key_list.values:
+                        if value not in existing_values:
+                            self.keys[key_int].append(value)
+                            existing_values.add(value)
                 else:
-                    self.keys[key] = list(key_list.values)
-                print(f"Node {self.node_id}: Received key {key} with values {key_list.values}")
+                    self.keys[key_int] = list(key_list.values)
+                print(f"Node {self.node_id}: Received key {key_int} with values {key_list.values}")
         return chord_pb2.Void()
+
 
     def FindSuccessor(self, request, context):
         id = request.id
@@ -94,7 +100,7 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
             ))
         else:
             return chord_pb2.GetPredecessorResponse(node=chord_pb2.NodeInfo(
-                node_id=-1,  # Use -1 to indicate no predecessor
+                node_id=-1,
                 ip='',
                 port=0
             ))
@@ -109,13 +115,68 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
                 self.predecessor['node_id'] == self.node_id or
                 self._in_half_open_interval(n_prime['node_id'], self.predecessor['node_id'], self.node_id)):
                 self.predecessor = n_prime
-                # print(f"Node {self.node_id}: Updated predecessor to {self.predecessor['node_id']}")
         return chord_pb2.Void()
 
     def Ping(self, request, context):
         return chord_pb2.PingResponse(success=True)
 
-    # Helper methods
+    def UpdateSuccessor(self, request, context):
+        with self.lock:
+            self.successor = {
+                'node_id': request.node_id,
+                'ip': request.ip,
+                'port': request.port
+            }
+            print(f"Node {self.node_id}: Successor updated to {self.successor['node_id']} on node leave")
+            self.send_keys_to_successor_replica_storage()
+        return chord_pb2.Void()
+
+    def UpdatePredecessor(self, request, context):
+        with self.lock:
+            self.predecessor = {
+                'node_id': request.node_id,
+                'ip': request.ip,
+                'port': request.port
+            }
+            print(f"Node {self.node_id}: Predecessor updated to {self.predecessor['node_id']} on node leave")
+        return chord_pb2.Void()
+
+    def StoreReplicaKeys(self, request, context):
+        with self.lock:
+            self.replica_keys.clear()
+            for key, key_list in request.keys.items():
+                key_int = int(key)
+                self.replica_keys[key_int] = list(key_list.values)
+            print(f"Node {self.node_id}: Stored replica keys from predecessor")
+        return chord_pb2.Void()
+
+    def StoreReplicaKeyValue(self, request, context):
+        with self.lock:
+            key = request.key
+            value = request.value
+            if key in self.replica_keys:
+                self.replica_keys[key].append(value)
+            else:
+                self.replica_keys[key] = [value]
+            print(f"Node {self.node_id}: Stored replica value {value} under key {key}")
+        return chord_pb2.Void()
+
+    def CopyReplicaToPrimary(self, request, context):
+        with self.lock:
+            for key, values in self.replica_keys.items():
+                if key in self.keys:
+                    existing_values = set(self.keys[key])
+                    for value in values:
+                        if value not in existing_values:
+                            self.keys[key].append(value)
+                            existing_values.add(value)
+                else:
+                    self.keys[key] = list(values)
+            self.replica_keys.clear()
+            print(f"Node {self.node_id}: Moved replica keys to primary storage and cleared replica storage")
+        return chord_pb2.Void()
+
+
     def _in_half_open_interval(self, id, start, end):
         start = start % self.max_id
         end = end % self.max_id
@@ -125,7 +186,6 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
         elif start > end:
             return start < id or id <= end
         else:
-            # start == end
             return id == start
 
     def _in_open_interval(self, id, start, end):
@@ -146,14 +206,12 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
 
     def join(self, contact_ip, contact_port):
         if contact_ip == self.ip and contact_port == self.port:
-            # First node in the network
             self.predecessor = None
             self.successor = {'node_id': self.node_id, 'ip': self.ip, 'port': self.port}
             print(f"Node {self.node_id}: Initialized as first node.")
         else:
             with grpc.insecure_channel(f"{contact_ip}:{contact_port}") as channel:
                 stub = chord_pb2_grpc.ChordNodeStub(channel)
-                # Find successor
                 response = stub.FindSuccessor(chord_pb2.FindSuccessorRequest(id=self.node_id))
                 self.successor = {
                     'node_id': response.node.node_id,
@@ -162,14 +220,11 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
                 }
                 print(f"Node {self.node_id}: Set successor to {self.successor['node_id']}")
 
-            # Now open a new channel to the successor
             with grpc.insecure_channel(f"{self.successor['ip']}:{self.successor['port']}") as succ_channel:
                 successor_stub = chord_pb2_grpc.ChordNodeStub(succ_channel)
-                # Notify the successor
                 successor_stub.Notify(chord_pb2.NotifyRequest(
                     node=chord_pb2.NodeInfo(node_id=self.node_id, ip=self.ip, port=self.port)
                 ))
-                # Get the successor's predecessor
                 response = successor_stub.GetPredecessor(chord_pb2.Void())
                 x = response.node
                 if x.node_id != -1:
@@ -177,20 +232,21 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
                 else:
                     self.predecessor = None
                 print(f"Node {self.node_id}: Set predecessor to {self.predecessor['node_id'] if self.predecessor else 'None'}")
-                # Request keys from successor
                 keys_response = successor_stub.GetKeys(chord_pb2.GetKeysRequest(node_id=self.node_id))
                 with self.lock:
                     for key, key_list in keys_response.keys.items():
-                        if int(key) in self.keys:
-                            self.keys[int(key)].extend(key_list.values)
+                        key_int = int(key)
+                        if key_int in self.keys:
+                            self.keys[key_int].extend(key_list.values)
                         else:
-                            self.keys[int(key)] = list(key_list.values)
+                            self.keys[key_int] = list(key_list.values)
                 if keys_response.keys:
                     print(f"Node {self.node_id}: Received keys {list(map(int, keys_response.keys.keys()))} from successor {self.successor['node_id']}")
-        # Start background threads
+
         threading.Thread(target=self.stabilize, daemon=True).start()
         threading.Thread(target=self.fix_fingers, daemon=True).start()
         threading.Thread(target=self.check_predecessor, daemon=True).start()
+        self.send_keys_to_successor_replica_storage()
 
     def stabilize(self):
         while True:
@@ -203,7 +259,7 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
                         self._in_open_interval(x.node_id, self.node_id, self.successor['node_id'])):
                         self.successor = {'node_id': x.node_id, 'ip': x.ip, 'port': x.port}
                         print(f"Node {self.node_id}: Updated successor to {self.successor['node_id']}")
-                    # Notify successor
+                        self.send_keys_to_successor_replica_storage()
                     stub.Notify(chord_pb2.NotifyRequest(
                         node=chord_pb2.NodeInfo(node_id=self.node_id, ip=self.ip, port=self.port)
                     ))
@@ -211,6 +267,7 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
                 print(f"Node {self.node_id}: Cannot contact successor {self.successor['node_id']}; finding new successor.")
                 self.successor = self.find_next_successor()
                 print(f"Node {self.node_id}: Successor updated to {self.successor['node_id']}")
+                self.send_keys_to_successor_replica_storage()
             time.sleep(1)
 
     def find_next_successor(self):
@@ -251,9 +308,22 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
                         response = stub.Ping(chord_pb2.Void())
                         if not response.success:
                             self.predecessor = None
+                            if self.successor['node_id'] == self.node_id:
+                                with self.lock:
+                                    self.replica_keys.clear()
+                                    print(f"Node {self.node_id}: Cleared replica storage (single-node network)")
                 except:
                     print(f"Node {self.node_id}: Predecessor {self.predecessor['node_id']} failed.")
                     self.predecessor = None
+                    if self.successor['node_id'] == self.node_id:
+                        with self.lock:
+                            self.replica_keys.clear()
+                            print(f"Node {self.node_id}: Cleared replica storage (single-node network)")
+            else:
+                if self.successor['node_id'] == self.node_id:
+                    with self.lock:
+                        self.replica_keys.clear()
+                        print(f"Node {self.node_id}: Cleared replica storage (single-node network)")
             time.sleep(1)
 
     def store_key_value(self, key, value):
@@ -285,31 +355,20 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
                 response = stub.FindSuccessor(chord_pb2.FindSuccessorRequest(id=id))
                 return {'node_id': response.node.node_id, 'ip': response.node.ip, 'port': response.node.port}
 
-    def UpdateSuccessor(self, request, context):
-        with self.lock:
-            self.successor = {
-                'node_id': request.node_id,
-                'ip': request.ip,
-                'port': request.port
-            }
-            print(f"Node {self.node_id}: Successor updated to {self.successor['node_id']} on node leave")
-        return chord_pb2.Void()
-
-    def UpdatePredecessor(self, request, context):
-        with self.lock:
-            self.predecessor = {
-                'node_id': request.node_id,
-                'ip': request.ip,
-                'port': request.port
-            }
-            print(f"Node {self.node_id}: Predecessor updated to {self.predecessor['node_id']} on node leave")
-        return chord_pb2.Void()
-
     def leave_network(self):
         print(f"Node {self.node_id}: Leaving the network gracefully...")
         self.transfer_keys_to_successor()
         self.notify_neighbors_on_leave()
-        # Stop the gRPC server
+
+        if self.successor['node_id'] != self.node_id:
+            try:
+                with grpc.insecure_channel(f"{self.successor['ip']}:{self.successor['port']}") as channel:
+                    stub = chord_pb2_grpc.ChordNodeStub(channel)
+                    stub.CopyReplicaToPrimary(chord_pb2.Void())
+                print(f"Node {self.node_id}: Instructed successor {self.successor['node_id']} to copy replica keys to primary storage")
+            except Exception as e:
+                print(f"Node {self.node_id}: Failed to notify successor to copy replica keys: {e}")
+
         self.server.stop(0)
         print(f"Node {self.node_id}: Left the network.")
 
@@ -318,12 +377,11 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
             with grpc.insecure_channel(f"{self.successor['ip']}:{self.successor['port']}") as channel:
                 stub = chord_pb2_grpc.ChordNodeStub(channel)
                 stub.TransferKeys(chord_pb2.TransferKeysRequest(keys={
-                    key: chord_pb2.KeyList(values=values) for key, values in self.keys.items()
+                    str(key): chord_pb2.KeyList(values=values) for key, values in self.keys.items()
                 }))
             print(f"Node {self.node_id}: Transferred keys to successor {self.successor['node_id']}")
 
     def notify_neighbors_on_leave(self):
-        # Notify successor to update its predecessor
         if self.successor['node_id'] != self.node_id:
             try:
                 with grpc.insecure_channel(f"{self.successor['ip']}:{self.successor['port']}") as channel:
@@ -337,7 +395,6 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
             except Exception as e:
                 print(f"Node {self.node_id}: Failed to notify successor: {e}")
 
-        # Notify predecessor to update its successor
         if self.predecessor and self.predecessor['node_id'] != self.node_id:
             try:
                 with grpc.insecure_channel(f"{self.predecessor['ip']}:{self.predecessor['port']}") as channel:
@@ -350,6 +407,24 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
                 print(f"Node {self.node_id}: Notified predecessor {self.predecessor['node_id']} to update successor")
             except Exception as e:
                 print(f"Node {self.node_id}: Failed to notify predecessor: {e}")
+
+    def send_keys_to_successor_replica_storage(self):
+        if self.successor['node_id'] != self.node_id:
+            with grpc.insecure_channel(f"{self.successor['ip']}:{self.successor['port']}") as channel:
+                stub = chord_pb2_grpc.ChordNodeStub(channel)
+                stub.StoreReplicaKeys(chord_pb2.TransferKeysRequest(keys={
+                    str(key): chord_pb2.KeyList(values=values) for key, values in self.keys.items()
+                }))
+            print(f"Node {self.node_id}: Sent keys to successor {self.successor['node_id']}'s replica storage")
+        else:
+            print("fn fail")
+
+    def replicate_key_value_to_successor(self, key, value):
+        if self.successor['node_id'] != self.node_id:
+            with grpc.insecure_channel(f"{self.successor['ip']}:{self.successor['port']}") as channel:
+                stub = chord_pb2_grpc.ChordNodeStub(channel)
+                stub.StoreReplicaKeyValue(chord_pb2.KeyValueRequest(key=key, value=value))
+            print(f"Node {self.node_id}: Replicated value {value} under key {key} to successor {self.successor['node_id']}")
 
     def print_ring_structure(self):
         print("Ring Structure:")
@@ -392,6 +467,9 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
         print("Keys stored:")
         for key in sorted(self.keys.keys()):
             print(f"  Key {key}: Values {self.keys[key]}")
+        print("Replica keys stored:")
+        for key in sorted(self.replica_keys.keys()):
+            print(f"  Key {key}: Values {self.replica_keys[key]}")
 
     def run(self):
         try:
@@ -421,7 +499,7 @@ class ChordNode(chord_pb2_grpc.ChordNodeServicer):
                         print("Invalid value. Please enter an integer.")
                 elif command == 'leave':
                     self.leave_network()
-                    break  # Exit the loop and stop the node
+                    break
                 else:
                     print("Unknown command.")
         except KeyboardInterrupt:

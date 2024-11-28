@@ -62,6 +62,7 @@ Here are the basic commands you can use within each node's terminal:
      - Successor
      - Predecessor
      - Key-value pairs stored at the node
+     - Replicas stored at the node
 
 3. **`add`**
    - **Description:** Adds a value to the network.
@@ -109,3 +110,6 @@ The network supports the following core functionalities:
 
 5. **Efficient Addition of Values**
    - **Mechanism:** Leverages finger tables to quickly determine the appropriate node for assigning new values.
+
+6. **Key, value pair replication**
+   - **Mechanism:** Replicates the key, value pairs stored at a node at its successor. 

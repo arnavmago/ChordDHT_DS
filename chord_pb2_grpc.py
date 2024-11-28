@@ -34,6 +34,26 @@ class ChordNodeStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.GetKeys = channel.unary_unary(
+                '/chord.ChordNode/GetKeys',
+                request_serializer=chord__pb2.GetKeysRequest.SerializeToString,
+                response_deserializer=chord__pb2.TransferKeysResponse.FromString,
+                _registered_method=True)
+        self.StoreKeyValue = channel.unary_unary(
+                '/chord.ChordNode/StoreKeyValue',
+                request_serializer=chord__pb2.KeyValueRequest.SerializeToString,
+                response_deserializer=chord__pb2.Void.FromString,
+                _registered_method=True)
+        self.GetKeyValues = channel.unary_unary(
+                '/chord.ChordNode/GetKeyValues',
+                request_serializer=chord__pb2.KeyRequest.SerializeToString,
+                response_deserializer=chord__pb2.KeyValueResponse.FromString,
+                _registered_method=True)
+        self.TransferKeys = channel.unary_unary(
+                '/chord.ChordNode/TransferKeys',
+                request_serializer=chord__pb2.TransferKeysRequest.SerializeToString,
+                response_deserializer=chord__pb2.Void.FromString,
+                _registered_method=True)
         self.FindSuccessor = channel.unary_unary(
                 '/chord.ChordNode/FindSuccessor',
                 request_serializer=chord__pb2.FindSuccessorRequest.SerializeToString,
@@ -54,30 +74,10 @@ class ChordNodeStub(object):
                 request_serializer=chord__pb2.NotifyRequest.SerializeToString,
                 response_deserializer=chord__pb2.Void.FromString,
                 _registered_method=True)
-        self.TransferKeys = channel.unary_unary(
-                '/chord.ChordNode/TransferKeys',
-                request_serializer=chord__pb2.TransferKeysRequest.SerializeToString,
-                response_deserializer=chord__pb2.Void.FromString,
-                _registered_method=True)
-        self.GetKeys = channel.unary_unary(
-                '/chord.ChordNode/GetKeys',
-                request_serializer=chord__pb2.GetKeysRequest.SerializeToString,
-                response_deserializer=chord__pb2.TransferKeysResponse.FromString,
-                _registered_method=True)
         self.Ping = channel.unary_unary(
                 '/chord.ChordNode/Ping',
                 request_serializer=chord__pb2.Void.SerializeToString,
                 response_deserializer=chord__pb2.PingResponse.FromString,
-                _registered_method=True)
-        self.StoreKeyValue = channel.unary_unary(
-                '/chord.ChordNode/StoreKeyValue',
-                request_serializer=chord__pb2.KeyValueRequest.SerializeToString,
-                response_deserializer=chord__pb2.Void.FromString,
-                _registered_method=True)
-        self.GetKeyValues = channel.unary_unary(
-                '/chord.ChordNode/GetKeyValues',
-                request_serializer=chord__pb2.KeyRequest.SerializeToString,
-                response_deserializer=chord__pb2.KeyValueResponse.FromString,
                 _registered_method=True)
         self.UpdateSuccessor = channel.unary_unary(
                 '/chord.ChordNode/UpdateSuccessor',
@@ -89,10 +89,49 @@ class ChordNodeStub(object):
                 request_serializer=chord__pb2.NodeInfo.SerializeToString,
                 response_deserializer=chord__pb2.Void.FromString,
                 _registered_method=True)
+        self.StoreReplicaKeys = channel.unary_unary(
+                '/chord.ChordNode/StoreReplicaKeys',
+                request_serializer=chord__pb2.TransferKeysRequest.SerializeToString,
+                response_deserializer=chord__pb2.Void.FromString,
+                _registered_method=True)
+        self.StoreReplicaKeyValue = channel.unary_unary(
+                '/chord.ChordNode/StoreReplicaKeyValue',
+                request_serializer=chord__pb2.KeyValueRequest.SerializeToString,
+                response_deserializer=chord__pb2.Void.FromString,
+                _registered_method=True)
+        self.CopyReplicaToPrimary = channel.unary_unary(
+                '/chord.ChordNode/CopyReplicaToPrimary',
+                request_serializer=chord__pb2.Void.SerializeToString,
+                response_deserializer=chord__pb2.Void.FromString,
+                _registered_method=True)
 
 
 class ChordNodeServicer(object):
     """Missing associated documentation comment in .proto file."""
+
+    def GetKeys(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StoreKeyValue(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetKeyValues(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def TransferKeys(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def FindSuccessor(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -118,31 +157,7 @@ class ChordNodeServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def TransferKeys(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def GetKeys(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def Ping(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def StoreKeyValue(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def GetKeyValues(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -160,9 +175,47 @@ class ChordNodeServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def StoreReplicaKeys(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StoreReplicaKeyValue(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CopyReplicaToPrimary(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ChordNodeServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'GetKeys': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetKeys,
+                    request_deserializer=chord__pb2.GetKeysRequest.FromString,
+                    response_serializer=chord__pb2.TransferKeysResponse.SerializeToString,
+            ),
+            'StoreKeyValue': grpc.unary_unary_rpc_method_handler(
+                    servicer.StoreKeyValue,
+                    request_deserializer=chord__pb2.KeyValueRequest.FromString,
+                    response_serializer=chord__pb2.Void.SerializeToString,
+            ),
+            'GetKeyValues': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetKeyValues,
+                    request_deserializer=chord__pb2.KeyRequest.FromString,
+                    response_serializer=chord__pb2.KeyValueResponse.SerializeToString,
+            ),
+            'TransferKeys': grpc.unary_unary_rpc_method_handler(
+                    servicer.TransferKeys,
+                    request_deserializer=chord__pb2.TransferKeysRequest.FromString,
+                    response_serializer=chord__pb2.Void.SerializeToString,
+            ),
             'FindSuccessor': grpc.unary_unary_rpc_method_handler(
                     servicer.FindSuccessor,
                     request_deserializer=chord__pb2.FindSuccessorRequest.FromString,
@@ -183,30 +236,10 @@ def add_ChordNodeServicer_to_server(servicer, server):
                     request_deserializer=chord__pb2.NotifyRequest.FromString,
                     response_serializer=chord__pb2.Void.SerializeToString,
             ),
-            'TransferKeys': grpc.unary_unary_rpc_method_handler(
-                    servicer.TransferKeys,
-                    request_deserializer=chord__pb2.TransferKeysRequest.FromString,
-                    response_serializer=chord__pb2.Void.SerializeToString,
-            ),
-            'GetKeys': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetKeys,
-                    request_deserializer=chord__pb2.GetKeysRequest.FromString,
-                    response_serializer=chord__pb2.TransferKeysResponse.SerializeToString,
-            ),
             'Ping': grpc.unary_unary_rpc_method_handler(
                     servicer.Ping,
                     request_deserializer=chord__pb2.Void.FromString,
                     response_serializer=chord__pb2.PingResponse.SerializeToString,
-            ),
-            'StoreKeyValue': grpc.unary_unary_rpc_method_handler(
-                    servicer.StoreKeyValue,
-                    request_deserializer=chord__pb2.KeyValueRequest.FromString,
-                    response_serializer=chord__pb2.Void.SerializeToString,
-            ),
-            'GetKeyValues': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetKeyValues,
-                    request_deserializer=chord__pb2.KeyRequest.FromString,
-                    response_serializer=chord__pb2.KeyValueResponse.SerializeToString,
             ),
             'UpdateSuccessor': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdateSuccessor,
@@ -216,6 +249,21 @@ def add_ChordNodeServicer_to_server(servicer, server):
             'UpdatePredecessor': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdatePredecessor,
                     request_deserializer=chord__pb2.NodeInfo.FromString,
+                    response_serializer=chord__pb2.Void.SerializeToString,
+            ),
+            'StoreReplicaKeys': grpc.unary_unary_rpc_method_handler(
+                    servicer.StoreReplicaKeys,
+                    request_deserializer=chord__pb2.TransferKeysRequest.FromString,
+                    response_serializer=chord__pb2.Void.SerializeToString,
+            ),
+            'StoreReplicaKeyValue': grpc.unary_unary_rpc_method_handler(
+                    servicer.StoreReplicaKeyValue,
+                    request_deserializer=chord__pb2.KeyValueRequest.FromString,
+                    response_serializer=chord__pb2.Void.SerializeToString,
+            ),
+            'CopyReplicaToPrimary': grpc.unary_unary_rpc_method_handler(
+                    servicer.CopyReplicaToPrimary,
+                    request_deserializer=chord__pb2.Void.FromString,
                     response_serializer=chord__pb2.Void.SerializeToString,
             ),
     }
@@ -228,6 +276,114 @@ def add_ChordNodeServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class ChordNode(object):
     """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def GetKeys(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chord.ChordNode/GetKeys',
+            chord__pb2.GetKeysRequest.SerializeToString,
+            chord__pb2.TransferKeysResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StoreKeyValue(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chord.ChordNode/StoreKeyValue',
+            chord__pb2.KeyValueRequest.SerializeToString,
+            chord__pb2.Void.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetKeyValues(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chord.ChordNode/GetKeyValues',
+            chord__pb2.KeyRequest.SerializeToString,
+            chord__pb2.KeyValueResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def TransferKeys(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chord.ChordNode/TransferKeys',
+            chord__pb2.TransferKeysRequest.SerializeToString,
+            chord__pb2.Void.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def FindSuccessor(request,
@@ -338,60 +494,6 @@ class ChordNode(object):
             _registered_method=True)
 
     @staticmethod
-    def TransferKeys(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/chord.ChordNode/TransferKeys',
-            chord__pb2.TransferKeysRequest.SerializeToString,
-            chord__pb2.Void.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def GetKeys(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/chord.ChordNode/GetKeys',
-            chord__pb2.GetKeysRequest.SerializeToString,
-            chord__pb2.TransferKeysResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
     def Ping(request,
             target,
             options=(),
@@ -408,60 +510,6 @@ class ChordNode(object):
             '/chord.ChordNode/Ping',
             chord__pb2.Void.SerializeToString,
             chord__pb2.PingResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def StoreKeyValue(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/chord.ChordNode/StoreKeyValue',
-            chord__pb2.KeyValueRequest.SerializeToString,
-            chord__pb2.Void.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def GetKeyValues(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/chord.ChordNode/GetKeyValues',
-            chord__pb2.KeyRequest.SerializeToString,
-            chord__pb2.KeyValueResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -515,6 +563,87 @@ class ChordNode(object):
             target,
             '/chord.ChordNode/UpdatePredecessor',
             chord__pb2.NodeInfo.SerializeToString,
+            chord__pb2.Void.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StoreReplicaKeys(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chord.ChordNode/StoreReplicaKeys',
+            chord__pb2.TransferKeysRequest.SerializeToString,
+            chord__pb2.Void.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StoreReplicaKeyValue(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chord.ChordNode/StoreReplicaKeyValue',
+            chord__pb2.KeyValueRequest.SerializeToString,
+            chord__pb2.Void.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CopyReplicaToPrimary(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chord.ChordNode/CopyReplicaToPrimary',
+            chord__pb2.Void.SerializeToString,
             chord__pb2.Void.FromString,
             options,
             channel_credentials,
